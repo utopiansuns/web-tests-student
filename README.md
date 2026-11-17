@@ -1,108 +1,75 @@
-# UI тесты Testboard
+# UI-тесты Testboard
 
-Учебный проект школы QA Авито на **JavaScript и Playwright Test** для сайта [Testboard](https://testboard.avito.com/).
+Автотесты на JavaScript и Playwright для сайта [Testboard](https://testboard.avito.com/). Сделаны в рамках практик и лабораторной работы школы QA Авито.
 
-Сделайте **один форк** этого репозитория в свой аккаунт. В нём вы напишете первый UI-тест, затем примените Page Object и выполните лабораторную. Готовых решений в исходной заготовке нет.
+## Тесты
 
-Все задания доступны заранее для подготовки. **Сейчас выполняйте и сдавайте только первую практику по автоматизации UI.** Архитектуру и лабораторную можно изучить заранее; к их выполнению и сдаче переходите после соответствующих занятий и объявления преподавателя. Продолжайте работу в этом же форке.
+Практика (`tests/practice`):
+- пустая форма входа показывает ошибки «Email обязателен» и «Пароль обязателен»;
+- поле email хранит введённое значение;
+- ссылка регистрации ведёт на /auth/register.
 
-## Задания
+Лабораторная работа:
 
-| Задание | Когда выполнять | Что нужно сделать | Результат |
+| ID | Что проверяется | Тип | Файл |
 | --- | --- | --- | --- |
-| [Практика по автоматизации UI](docs/01-first-test.md) | **Сейчас** | Проверить ошибки пустой формы входа | Один тест с двумя проверками |
-| [Практика по архитектуре](docs/02-architecture.md) | **Для ознакомления — следующее занятие** | После изучения ООП и архитектуры перенести первый тест на Page Object и добавить два сценария | Три независимых теста, helper и настройки |
-| [Лабораторная работа](docs/03-laboratory.md) | **Для ознакомления — после блока практик** | Проверить создание объявлений и избранное, реализовать подготовку и очистку данных | Ещё минимум 12 UI-тестов, включая пять негативных; максимум 15 баллов |
+| C1 | Создание объявления через форму, проверка всех полей и фото на странице объявления | позитивный | tests/create/create-ad.spec.js |
+| C2 | Отправка пустой формы: три ошибки обязательных полей | негативный | tests/create/create-ad-validation.spec.js |
+| C3 | Гость открывает /advertisements/create и попадает на /auth/login | негативный | tests/create/guest-access.spec.js |
+| C4 | Цена 1 000 001 ₽: ошибка, значения сохранены, запрос не отправлен | негативный | tests/create/create-ad-validation.spec.js |
+| C5 | Количество 101: ошибка, значения сохранены, запрос не отправлен | негативный | tests/create/create-ad-validation.spec.js |
+| F1 | Пустое избранное | позитивный | tests/favorites/favorites.spec.js |
+| F2 | Добавление из каталога | позитивный | tests/favorites/favorites.spec.js |
+| F3 | Сохранение после обновления страницы | позитивный | tests/favorites/favorites.spec.js |
+| F4 | Удаление из избранного | позитивный | tests/favorites/favorites.spec.js |
+| F5 | Поиск без совпадений и возврат карточек после очистки | негативный | tests/favorites/favorites.spec.js |
+| V1.1, V1.2 | Вариант 1: повторное нажатие, два объявления | позитивный | tests/favorites/variant-1-catalog.spec.js |
+| V2.1, V2.2 | Вариант 2: добавление со страницы объявления, согласованность состояния | позитивный | tests/favorites/variant-2-ad-page.spec.js |
+| V3.1, V3.2 | Вариант 3: поиск по названию, сортировка по цене | позитивный | tests/favorites/variant-3-search-sort.spec.js |
 
-Каталоги pages, helpers, configs и fixtures создавайте по мере выполнения соответствующих заданий. Для первой практики достаточно tests/empty-login.spec.js.
+## Структура
 
-## Подготовка
+- `pages` — Page Object: главная с каталогом, попап и страница входа, регистрация, создание объявления, объявление, избранное.
+- `components/adCard.js` — карточка объявления, поиск карточки по UUID.
+- `helpers` — учебный email, тестовые данные, работа с API.
+- `configs/environment.js` — адрес сайта и данные продавца из .env.
+- `fixtures/index.js` — вход продавца через API, создание объявлений и их удаление после теста.
+- `assets/test-photo.png` — фото для объявлений.
 
-1. Установите [Node.js](https://nodejs.org/en/download) версии 22.15 или новее и [Git](https://git-scm.com/downloads). Используйте WebStorm или VS Code.
-2. На странице [qa-course-avito/web-tests-student](https://github.com/qa-course-avito/web-tests-student) нажмите **Fork**, выберите свой аккаунт и затем **Create fork**.
-3. В своём форке нажмите **Code** и скопируйте HTTPS-адрес. Клонируйте именно свой репозиторий:
+Объявления для тестов избранного создаются через API с уникальным названием и фото. ID сохраняется сразу после создания, после теста объявление удаляется (в том числе если тест упал). Перед удалением проверяется, что объявление принадлежит продавцу. Тесты избранного выполняются гостем в новом контексте браузера, тесты создания — с сессией продавца.
+
+## Установка и настройка
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_LOGIN/web-tests-student.git
-cd web-tests-student
 npm ci
 npx playwright install chromium
+cp .env.example .env
 ```
 
-В команде замените YOUR_GITHUB_LOGIN на свой GitHub-логин. Если при создании форка изменили имя репозитория, используйте его адрес и название папки. Для отправки изменений настройте [аутентификацию GitHub](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github).
+В `.env` указать данные учебного продавца, зарегистрированного на Testboard:
 
-Для первой практики и практики по архитектуре учебный аккаунт Testboard и .env не нужны. Файл .env.example и фотография assets/test-photo.png подготовлены для лабораторной; настройку аккаунта, чтение .env и подготовку данных выполняйте на её этапе.
+```
+BASE_URL=https://testboard.avito.com
+E2E_USER_EMAIL=
+E2E_USER_PASSWORD=
+```
 
-## Запуск и отладка
+## Запуск
 
 ```bash
-# Все тесты проекта
-npm test
-
-# Запуск с видимым браузером
-npm test -- --headed
-
-# Пошаговая отладка в Playwright Inspector
-npm test -- --debug
-
-# Интерактивный режим Playwright
-npm test -- --ui
-
-# Открыть HTML-отчёт после запуска
-npm run report
+npm test                                  # все тесты
+npm test -- tests/create tests/favorites  # только лабораторная
+npm test -- tests/practice                # только практика
+npm test -- --repeat-each=3               # три прогона подряд
+npm test -- -g "C1:"                      # один тест
+npm test -- --headed                      # с браузером
 ```
 
-В исходном tests/empty-login.spec.js оставлен throw с сообщением TODO. До реализации сценария запуск завершится этой ошибкой. Замените заготовку своим тестом и удалите throw.
-
-При падении Playwright сохраняет screenshot и trace в test-results. В HTML-отчёте можно открыть trace; локально его также можно посмотреть командой `npx playwright show-trace`, указав путь к trace.zip. Результаты запусков и данные сессии исключены из Git.
-
-## Первая практика
-
-В [tests/empty-login.spec.js](tests/empty-login.spec.js) реализуйте **один test()**:
-
-1. Откройте главную страницу.
-2. Откройте форму входа.
-3. Отправьте форму с пустыми email и паролем.
-4. Проверьте сообщения **«Email обязателен»** и **«Пароль обязателен»**.
-
-Все пять TODO относятся к одному тесту. Локаторы найдите самостоятельно в DevTools. Подробности и критерии готовности — в [задании первой практики](docs/01-first-test.md).
-
-## Сохранение работы
-
-После выполнения задания проверьте состав изменений, создайте коммит и отправьте его в свой форк:
+## Отчёт и trace
 
 ```bash
-git status
-git add tests/empty-login.spec.js
-git commit -m "Add first UI test"
-git push origin main
-git rev-parse HEAD
+npx playwright show-report
+npx playwright show-trace test-results/<папка-теста>/trace.zip
 ```
 
-Преподавателю передайте ссылку на свой форк и SHA коммита текущего задания. Сохраните тест и продолжайте работу в этом же репозитории после следующих занятий; повторный форк не нужен. Для следующих заданий добавляйте в коммит созданные модули и тесты.
-
-В Git не должны попадать .env, пароли, токены, сохранённые сессии, node_modules и результаты запусков. Перед отправкой проверяйте `git diff --cached`.
-
-## Структура проекта
-
-- `pages/basePage.js` — базовый класс страницы, открывает путь.
-- `pages/mainPage.js` — главная страница, открытие формы входа.
-- `pages/loginPopupPage.js` — форма входа: поля, отправка, ссылка на регистрацию.
-- `pages/registerPage.js` — страница регистрации.
-- `helpers/studentEmail.js` — учебный email для теста ввода.
-- `configs/environment.js` — адрес сайта (BASE_URL или https://testboard.avito.com).
-- `tests/practice/login.spec.js` — три теста формы входа.
-
-```bash
-npm test -- tests/practice
-npm test -- tests/practice --repeat-each=3
-```
-
-## Полезные ссылки
-
-- [Playwright на JavaScript](https://playwright.dev/docs/intro)
-- [Локаторы](https://playwright.dev/docs/locators)
-- [Проверки expect](https://playwright.dev/docs/test-assertions)
-- [Page Object — к практике по архитектуре](https://playwright.dev/docs/pom)
-- [Спецификация API Testboard — к лабораторной](https://testboard.avito.com/docs/swagger.json)
-- [Как сделать форк репозитория](https://docs.github.com/en/pull-requests/how-tos/work-with-forks/fork-a-repo)
+При падении теста в test-results сохраняются скриншот и trace. Отчёты, trace и .env в репозиторий не попадают.
