@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { environment } from './configs/environment.js';
 
 export default defineConfig({
   testDir: './tests',
@@ -9,7 +10,7 @@ export default defineConfig({
   expect: { timeout: 10_000 },
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: 'https://testboard.avito.com',
+    baseURL: environment.baseURL,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },

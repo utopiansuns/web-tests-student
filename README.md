@@ -83,6 +83,21 @@ git rev-parse HEAD
 
 В Git не должны попадать .env, пароли, токены, сохранённые сессии, node_modules и результаты запусков. Перед отправкой проверяйте `git diff --cached`.
 
+## Структура проекта
+
+- `pages/basePage.js` — базовый класс страницы, открывает путь.
+- `pages/mainPage.js` — главная страница, открытие формы входа.
+- `pages/loginPopupPage.js` — форма входа: поля, отправка, ссылка на регистрацию.
+- `pages/registerPage.js` — страница регистрации.
+- `helpers/studentEmail.js` — учебный email для теста ввода.
+- `configs/environment.js` — адрес сайта (BASE_URL или https://testboard.avito.com).
+- `tests/practice/login.spec.js` — три теста формы входа.
+
+```bash
+npm test -- tests/practice
+npm test -- tests/practice --repeat-each=3
+```
+
 ## Полезные ссылки
 
 - [Playwright на JavaScript](https://playwright.dev/docs/intro)
